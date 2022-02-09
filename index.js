@@ -17,9 +17,37 @@ app.get('/', (req, res) => {
     res.render('index', { posts: posts});
   });
 });
+
+app.get('/posts', (req, res) => {
+  Post.find((err, posts) => {
+    res.json(posts);
+  });
+});
+
+app.get('/posts/:id',(req, res) =>{
+  Post.findById(req.params.id,(err,post) =>{
+    res.render('post',{post: post});
+  });
+});
+
 app.get('/new', (req, res) => {
   res.render('new_post');
 });
+
+app.post('/comments',(req, res) => {
+  console.log('Recibimos');
+  console.log(req.body);
+  const{ name, comment, id } = req.body;
+  const newComment = { name, comment };
+  Post.findById(id, (err,post) => {
+    post.comments.push(newComment);
+    console.log(post);
+    post.save((err, post) => {
+      res.redirect('/posts/' + id);
+    });
+  });
+});
+
 app.post('/new', (req, res) => {
   //guardamos un post en la base de datos
   console.log('datos recibidos');
